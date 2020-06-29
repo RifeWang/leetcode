@@ -644,5 +644,70 @@ var twoSum = function(numbers, target) {
  * @return {number}
  */
 var findDuplicate = function(nums) {
+    // 如果无重复数，[left, right] 之间的个数应该小于等于 right - left + 1
+    // 否则重复数在此区间内，不断缩小区间，直到 left == right
+
+    let [left, right] = [1, nums.length-1];
+    while (left < right) {
+        const mid = Math.floor((right-left) / 2) + left;
+
+        // 统计 [left, mid] 个数
+        let count = 0;
+        nums.map(v => {
+            if (v <= mid && v >= left) {
+                count++;
+            }
+        });
+        if (count <= (mid - left + 1)) {
+            left = mid + 1;
+        } else {
+            right = mid;
+        }
+    }
+    return left;
+};
+
+
+
+
+
+
+// ----------- 寻找两个正序数组的中位数 -----------
+/**
+ * @param {number[]} nums1
+ * @param {number[]} nums2
+ * @return {number}
+ */
+var findMedianSortedArrays = function(nums1, nums2) {
+
+};
+
+
+
+
+
+
+// ----------- 找出第 k 小的距离对 -----------
+/**
+ * @param {number[]} nums
+ * @param {number} k
+ * @return {number}
+ */
+var smallestDistancePair = function(nums, k) {
+
+};
+
+
+
+
+
+
+// ----------- 分割数组的最大值 -----------
+/**
+ * @param {number[]} nums
+ * @param {number} m
+ * @return {number}
+ */
+var splitArray = function(nums, m) {
 
 };
