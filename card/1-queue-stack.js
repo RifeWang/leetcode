@@ -424,3 +424,315 @@ var evalRPN = function(tokens) {
 var cloneGraph = function(node) {
     // todo
 };
+
+
+
+
+
+
+// -----------  目标和 -----------
+/**
+ * @param {number[]} nums
+ * @param {number} S
+ * @return {number}
+ */
+var findTargetSumWays = function(nums, S) {
+    let res = 0;
+    function dfs (sum, step) {
+        if (step == nums.length) {
+            if (sum == S) {
+                res++;
+            }
+            return;
+        }
+        dfs(sum + nums[step], step+1);
+        dfs(sum - nums[step], step+1);
+    }
+    dfs(0, 0);
+    return res;
+};
+
+
+
+
+
+
+// -----------  二叉树的中序遍历 -----------
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val) {
+ *     this.val = val;
+ *     this.left = this.right = null;
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @return {number[]}
+ */
+var inorderTraversal = function(root) {
+    const result = [];
+    if (root != null) {
+        result.push(...inorderTraversal(root.left));
+        result.push(root.val);
+        result.push(...inorderTraversal(root.right));
+    }
+    return result;
+};
+
+
+
+
+
+
+// -----------  用栈实现队列 -----------
+/**
+ * Initialize your data structure here.
+ */
+var MyQueue = function() {
+    this.stack = [];
+};
+
+/**
+ * Push element x to the back of queue.
+ * @param {number} x
+ * @return {void}
+ */
+MyQueue.prototype.push = function(x) {
+    this.stack.push(x);
+};
+
+/**
+ * Removes the element from in front of queue and returns that element.
+ * @return {number}
+ */
+MyQueue.prototype.pop = function() {
+    const tmp = [];
+    let head = null;
+    while (this.stack.length) {
+        tmp.push(this.stack.pop());
+    }
+    head = tmp.pop();
+    while (tmp.length) {
+        this.stack.push(tmp.pop());
+    }
+    return head;
+};
+
+/**
+ * Get the front element.
+ * @return {number}
+ */
+MyQueue.prototype.peek = function() {
+    const tmp = [];
+    let head = null;
+    while (this.stack.length) {
+        tmp.push(this.stack.pop());
+    }
+    while (tmp.length) {
+        if (head == null) {
+            head = tmp.pop();
+            this.stack.push(head);
+        } else {
+            this.stack.push(tmp.pop());
+        }
+    }
+    return head;
+};
+
+/**
+ * Returns whether the queue is empty.
+ * @return {boolean}
+ */
+MyQueue.prototype.empty = function() {
+    return this.stack.length === 0;
+};
+
+/**
+ * Your MyQueue object will be instantiated and called as such:
+ * var obj = new MyQueue()
+ * obj.push(x)
+ * var param_2 = obj.pop()
+ * var param_3 = obj.peek()
+ * var param_4 = obj.empty()
+ */
+
+
+
+
+
+
+// -----------  用队列实现栈 -----------
+/**
+ * Initialize your data structure here.
+ */
+var MyStack = function() {
+    this.queue = [];
+};
+
+/**
+ * Push element x onto stack.
+ * @param {number} x
+ * @return {void}
+ */
+MyStack.prototype.push = function(x) {
+    this.queue.push(x);
+};
+
+/**
+ * Removes the element on top of the stack and returns that element.
+ * @return {number}
+ */
+MyStack.prototype.pop = function() {
+    const tmp = [];
+    while (this.queue.length > 1) {
+        tmp.push(this.queue.shift());
+    }
+    const top = this.queue.length ? this.queue.shift() : null;
+    this.queue = tmp;
+    return top;
+};
+
+/**
+ * Get the top element.
+ * @return {number}
+ */
+MyStack.prototype.top = function() {
+    const tmp = [];
+    let top = null;
+    while (this.queue.length) {
+        top = this.queue.shift();
+        tmp.push(top);
+    }
+    this.queue = tmp;
+    return top;
+};
+
+/**
+ * Returns whether the stack is empty.
+ * @return {boolean}
+ */
+MyStack.prototype.empty = function() {
+    return this.queue.length == 0;
+};
+
+/**
+ * Your MyStack object will be instantiated and called as such:
+ * var obj = new MyStack()
+ * obj.push(x)
+ * var param_2 = obj.pop()
+ * var param_3 = obj.top()
+ * var param_4 = obj.empty()
+ */
+
+
+
+
+
+
+
+// -----------  字符串解码 -----------
+/**
+ * @param {string} s
+ * @return {string}
+ */
+var decodeString = function(s) {
+    let result = '';
+    const charStack = [];
+    const numStack = [];
+    let number = '';
+    for (let i = 0; i < s.length; i++) {
+        const char = s.charAt(i);
+        if (Number.isInteger(Number(char))) {
+            number += char;
+        } else {
+            if (number !== '') {
+                numStack.push(number);
+                number = '';
+            }
+
+            if (char == ']') {
+                let str = '';
+                while (charStack.length) {
+                    const sc = charStack.pop();
+                    if (sc == '[') {
+                        break;
+                    }
+                    str = sc + str;
+                }
+                if (str !== '') {
+                    const repeat = numStack.pop();
+                    const ss = str.repeat(repeat);
+                    if (charStack.length) {
+                        charStack.push(ss);
+                    } else {
+                        result = result + ss;
+                    }
+                }
+            } else if (char == '[') {
+                charStack.push(char);
+            } else {
+                if (charStack.length) {
+                    charStack.push(char);
+                } else {
+                    result = result + char;
+                }
+            }
+        }
+    }
+    return result;
+};
+
+
+
+
+
+
+
+// -----------  图像渲染 -----------
+/**
+ * @param {number[][]} image
+ * @param {number} sr
+ * @param {number} sc
+ * @param {number} newColor
+ * @return {number[][]}
+ */
+var floodFill = function(image, sr, sc, newColor) {
+    const M = image.length;
+    if (M == 0) {
+        return image;
+    }
+    const N = image[0].length;
+    if (N == 0) {
+        return image;
+    }
+
+    let sourceColor = null;
+    const queue = [[sr, sc]];
+    while (queue.length) {
+        const [i, j] = queue.shift();
+        if (i >= 0 && i < M && j >= 0 && j < N) {
+            if (sourceColor == null) {
+                sourceColor = image[i][j];
+            }
+            if (sourceColor == image[i][j] && sourceColor != newColor) {
+                image[i][j] = newColor;
+                queue.push([i-1, j], [i, j-1], [i+1, j], [i, j+1]);
+            }
+        }
+    }
+    return image;
+};
+
+
+
+
+
+
+// -----------  01 矩阵 -----------
+/**
+ * @param {number[][]} matrix
+ * @return {number[][]}
+ */
+var updateMatrix = function(matrix) {
+
+};
