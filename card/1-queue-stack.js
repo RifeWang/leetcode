@@ -422,7 +422,24 @@ var evalRPN = function(tokens) {
  * @return {Node}
  */
 var cloneGraph = function(node) {
-    // todo
+    const map = new Map();
+    function dfs(node) {
+        if (node == null) {
+            return
+        }
+        map.set(node.val, new Node(node.val));
+
+        for (const neighbor of node.neighbors) {
+            if (map.has(neighbor.val)) {
+                map.get(node.val).neighbors.push(map.get(neighbor.val));
+            } else {
+                map.get(node.val).neighbors.push(dfs(neighbor));
+            }
+        }
+        return map.get(node.val);
+    }
+    dfs(node);
+    return node == null ? null : map.get(node.val);
 };
 
 
@@ -734,5 +751,74 @@ var floodFill = function(image, sr, sc, newColor) {
  * @return {number[][]}
  */
 var updateMatrix = function(matrix) {
+    // dp[i][j] = dp[i][j] == 0 ? 0 : min(dp[i-1][j], dp[i][j-1], dp[i+1][j], dp[i][j+1]) + 1
+    // 避免不确定元素，需要两次遍历
 
+    const M = matrix.length;
+    if (M == 0) {
+        return matrix;
+    }
+    const N = matrix[0].length;
+    if (N == 0) {
+        return matrix;
+    }
+
+    const dist = new Array(M);
+    for (let i = 0; i < M; i++) {
+        dist[i] = new Array(N).fill(Number.MAX_SAFE_INTEGER - 10000); // 初始化每个元素的距离
+    }
+
+    // 第一次遍历，从左到右，从上到下，只比较当前元素与其 左 + 上 方向元素
+    for (let i = 0; i < M; i++) {
+        for (let j = 0; j < N; j++) {
+            if (matrix[i][j] == 0) {
+                dist[i][j] = 0;
+            } else {  // [i, j-1], [i-1, j]
+                const neighbor = Math.min(j-1 >= 0 ? dist[i][j-1] : Number.MAX_SAFE_INTEGER, i-1 >= 0 ? dist[i-1][j] : Number.MAX_SAFE_INTEGER) + 1;
+                if (dist[i][j] > neighbor) {
+                    dist[i][j] = neighbor;
+                }
+            }
+        }
+    }
+
+    // 第二次遍历，从右到左，从下到上，只比较当前元素与其 右 + 下 方向元素
+    for (let i = M-1; i >= 0; i--) {
+        for (let j = N-1; j >= 0; j--) {
+            if (matrix[i][j] == 0) {
+                dist[i][j] = 0;
+            } else {  // [i, j+1], [i+1, j]
+                const neighbor = Math.min(j+1 < N ? dist[i][j+1] : Number.MAX_SAFE_INTEGER, i+1 < M ? dist[i+1][j] : Number.MAX_SAFE_INTEGER) + 1;
+                if (dist[i][j] > neighbor) {
+                    dist[i][j] = neighbor;
+                }
+            }
+        }
+    }
+    return dist;
+};
+
+
+
+
+
+
+
+// -----------  钥匙和房间 -----------
+/**
+ * @param {number[][]} rooms
+ * @return {boolean}
+ */
+var canVisitAllRooms = function(rooms) {
+    const visitedRooms = new Set();
+    function dfs (roomNumber) {
+        if (!visitedRooms.has(roomNumber)) {
+            visitedRooms.add(roomNumber);
+            for (const room of rooms[roomNumber]) {
+                dfs(room);
+            }
+        }
+    }
+    dfs(0);
+    return visitedRooms.size == rooms.length;
 };
